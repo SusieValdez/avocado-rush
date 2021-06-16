@@ -142,9 +142,15 @@ export default class Game extends Phaser.Scene {
 
     const style = { color: "#000", fontSize: 24 };
     this.scoreText = this.add
-      .text(240, 10, "Score: 0", style)
-      .setScrollFactor(0)
-      .setOrigin(0.5, 0);
+      .text(10, 10, `Score: ${this.score}`, style)
+      .setScrollFactor(0);
+
+    if (localStorage.getItem("top-score") === null) {
+      localStorage.setItem("top-score", 0);
+    }
+    this.topScoreText = this.add
+      .text(10, 44, `Top Score: ${localStorage.getItem("top-score")}`, style)
+      .setScrollFactor(0);
 
     this.cameras.main.startFollow(this.player);
     this.cameras.main.setDeadzone(this.scale.width * 1.5);
@@ -191,7 +197,6 @@ export default class Game extends Phaser.Scene {
     this.checkPlatforms();
 
     if (this.player.y > this.lastJumpPosition + this.scale.height / 2) {
-      console.log(this.player.y, this.lastJumpPosition);
       this.die();
     }
 
@@ -263,8 +268,11 @@ export default class Game extends Phaser.Scene {
       }
     }
     this.score += scoreIncrease;
-    const value = `Score: ${this.score}`;
-    this.scoreText.text = value;
+    if (this.score > localStorage.getItem("top-score")) {
+      localStorage.setItem("top-score", this.score);
+      this.topScoreText.text = `Top Score: ${this.score}`;
+    }
+    this.scoreText.text = `Score: ${this.score}`;
   }
 
   die() {
